@@ -87,7 +87,7 @@ export default function CompanyForm() {
           <input
             type="color"
             {...register("companyColors")}
-            className="w-full border p-2 rounded"
+            className="w-full border p-3 h-12 rounded"
           />
         </div>
 
