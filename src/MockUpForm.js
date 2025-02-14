@@ -19,19 +19,42 @@ export default function CompanyForm() {
   };
 
   // Open camera
+  // const openCamera = async () => {
+  //   try {
+  //     const mediaStream = await navigator.mediaDevices.getUserMedia({
+  //       video: true,
+  //     });
+  //     videoRef.current.srcObject = mediaStream;
+  //     setStream(mediaStream);
+  //     setIsCameraOpen(true);
+  //   } catch (error) {
+  //     console.error("Error accessing camera:", error);
+  //   }
+  // };
+
   const openCamera = async () => {
     try {
-      const mediaStream = await navigator.mediaDevices.getUserMedia({
-        video: true,
-      });
-      videoRef.current.srcObject = mediaStream;
-      setStream(mediaStream);
-      setIsCameraOpen(true);
+      const constraints = {
+        video: {
+          facingMode: "environment", // Use the back camera by default
+        },
+      };
+
+      const mediaStream = await navigator.mediaDevices.getUserMedia(
+        constraints
+      );
+      if (videoRef.current) {
+        videoRef.current.srcObject = mediaStream;
+        setStream(mediaStream);
+        setIsCameraOpen(true);
+      }
     } catch (error) {
+      alert(
+        "Camera access denied. Please enable permissions in your browser settings."
+      );
       console.error("Error accessing camera:", error);
     }
   };
-
   // Capture photo from camera
   const capturePhoto = () => {
     const canvas = document.createElement("canvas");
@@ -142,7 +165,7 @@ export default function CompanyForm() {
             onClick={openCamera}
             className="mt-2 px-4 py-2 bg-blue-500 text-white rounded"
           >
-            Use Camera
+            Take Photo
           </button>
         </div>
 
