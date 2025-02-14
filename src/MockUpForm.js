@@ -5,56 +5,43 @@ export default function CompanyForm() {
   const { register, handleSubmit, setValue } = useForm();
   const [imagePreview, setImagePreview] = useState(null);
   const fileInputRef = useRef(null);
-  const videoRef = useRef(null);
-  const [isCameraOpen, setIsCameraOpen] = useState(false);
-  const [stream, setStream] = useState(null);
-
-  // Open back camera
-  const initializeMedia = async () => {
-    try {
-      const mediaStream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: "environment" },
-      });
-
-      if (videoRef.current) {
-        videoRef.current.srcObject = mediaStream;
-        setStream(mediaStream);
-        setIsCameraOpen(true);
-      }
-    } catch (error) {
-      alert("Error accessing the camera. Please check permissions.");
-      console.error("Camera Error:", error);
-    }
-  };
-
-  // Capture photo
-  const capturePhoto = () => {
-    if (!videoRef.current) return;
-
-    const canvas = document.createElement("canvas");
-    canvas.width = videoRef.current.videoWidth;
-    canvas.height = videoRef.current.videoHeight;
-    canvas
-      .getContext("2d")
-      .drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
-
-    const imageUrl = canvas.toDataURL("image/png");
-    setImagePreview(imageUrl);
-    setValue("companyLogo", imageUrl);
-    stopCamera();
-  };
-
-  // Stop camera
-  const stopCamera = () => {
-    if (stream) {
-      stream.getTracks().forEach((track) => track.stop());
-    }
-    setIsCameraOpen(false);
-  };
+  const [thankYouMessage, setThankYouMessage] = useState(null);
 
   // Form submission
-  const onSubmit = (data) => {
+  const onSubmit = async (data) => {
     console.log("Form Data:", data);
+
+    // Prepare the form data
+    const formData = new FormData();
+    formData.append("companyName", data.companyName);
+    formData.append("companyColors", data.companyColors);
+    formData.append("email", data.email);
+    formData.append("phone", data.phone);
+    formData.append("companyLogo", data.companyLogo[0]);
+
+    try {
+      // POST request to your backend
+      const response = await fetch(
+        "https://theivanacollective.com/api/submit-form",
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+
+      if (response.ok) {
+        // Show thank you message
+        setThankYouMessage(
+          "Thank you for contacting The Ivana Collective. Your results will be emailed within 48 hours."
+        );
+      } else {
+        // Handle error
+        alert("Something went wrong. Please try again later.");
+      }
+    } catch (error) {
+      console.error("Error submitting form:", error);
+      alert("Something went wrong. Please try again later.");
+    }
   };
 
   return (
@@ -138,43 +125,7 @@ export default function CompanyForm() {
               }
             }}
           />
-
-          {/* Buttons: Open Camera, Capture, Close */}
-          <div className="mt-4 space-x-2 flex">
-            <button
-              type="button"
-              onClick={initializeMedia}
-              className="px-4 py-2 bg-black text-white font-semibold rounded-lg hover:bg-gray-800 transition"
-            >
-              Open Camera
-            </button>
-            {isCameraOpen && (
-              <>
-                <button
-                  type="button"
-                  onClick={capturePhoto}
-                  className="px-4 py-2 bg-green-500 text-white font-semibold rounded-lg hover:bg-green-600 transition"
-                >
-                  Capture
-                </button>
-                <button
-                  type="button"
-                  onClick={stopCamera}
-                  className="px-4 py-2 bg-red-500 text-white font-semibold rounded-lg hover:bg-red-600 transition"
-                >
-                  Close Camera
-                </button>
-              </>
-            )}
-          </div>
         </div>
-
-        {/* Video Preview (Camera View) */}
-        {isCameraOpen && (
-          <div className="mt-4 border-2 border-black rounded-lg overflow-hidden">
-            <video ref={videoRef} autoPlay className="w-full"></video>
-          </div>
-        )}
 
         {/* Submit Button */}
         <button
@@ -184,6 +135,13 @@ export default function CompanyForm() {
           Submit
         </button>
       </form>
+
+      {/* Thank You Message */}
+      {thankYouMessage && (
+        <div className="mt-4 text-center text-black font-semibold">
+          {thankYouMessage}
+        </div>
+      )}
     </div>
   );
 }
