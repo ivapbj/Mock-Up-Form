@@ -18,64 +18,42 @@ export default function CompanyForm() {
     }
   };
 
-  // Open camera
-  // const openCamera = async () => {
-  //   try {
-  //     const mediaStream = await navigator.mediaDevices.getUserMedia({
-  //       video: true,
-  //     });
-  //     videoRef.current.srcObject = mediaStream;
-  //     setStream(mediaStream);
-  //     setIsCameraOpen(true);
-  //   } catch (error) {
-  //     console.error("Error accessing camera:", error);
-  //   }
-  // };
-
-  const openCamera = async () => {
+  // Open back camera
+  const initializeMedia = async () => {
     try {
-      const constraints = {
-        video: {
-          facingMode: "environment", // Use the back camera by default
-        },
-      };
+      const mediaStream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: { exact: "environment" } }, // Use back camera
+      });
 
-      const mediaStream = await navigator.mediaDevices.getUserMedia(
-        constraints
-      );
       if (videoRef.current) {
         videoRef.current.srcObject = mediaStream;
         setStream(mediaStream);
         setIsCameraOpen(true);
       }
     } catch (error) {
-      alert(
-        "Camera access denied. Please enable permissions in your browser settings."
-      );
+      alert("Camera access denied. Please enable permissions.");
       console.error("Error accessing camera:", error);
     }
   };
-  // Capture photo from camera
+
+  // Capture photo
   const capturePhoto = () => {
+    if (!videoRef.current) return;
+
     const canvas = document.createElement("canvas");
-    const video = videoRef.current;
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    canvas.getContext("2d").drawImage(video, 0, 0, canvas.width, canvas.height);
+    canvas.width = videoRef.current.videoWidth;
+    canvas.height = videoRef.current.videoHeight;
+    canvas
+      .getContext("2d")
+      .drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
 
-    canvas.toBlob((blob) => {
-      const file = new File([blob], "captured-image.png", {
-        type: "image/png",
-      });
-      setImagePreview(URL.createObjectURL(blob));
-      setValue("companyLogo", file);
-    });
-
-    // Stop the camera stream
+    const imageUrl = canvas.toDataURL("image/png");
+    setImagePreview(imageUrl);
+    setValue("companyLogo", imageUrl);
     stopCamera();
   };
 
-  // Stop camera stream
+  // Stop camera
   const stopCamera = () => {
     if (stream) {
       stream.getTracks().forEach((track) => track.stop());
@@ -159,14 +137,34 @@ export default function CompanyForm() {
             onChange={handleFileChange}
           />
 
-          {/* Camera Button */}
-          <button
-            type="button"
-            onClick={openCamera}
-            className="mt-2 px-4 py-2 bg-blue-500 text-white rounded"
-          >
-            Take Photo
-          </button>
+          {/* Camera Buttons */}
+          <div className="mt-2 space-x-2">
+            <button
+              type="button"
+              onClick={initializeMedia}
+              className="px-4 py-2 bg-blue-500 text-white rounded"
+            >
+              Open Camera
+            </button>
+            {isCameraOpen && (
+              <>
+                <button
+                  type="button"
+                  onClick={capturePhoto}
+                  className="px-4 py-2 bg-green-500 text-white rounded"
+                >
+                  Capture
+                </button>
+                <button
+                  type="button"
+                  onClick={stopCamera}
+                  className="px-4 py-2 bg-red-500 text-white rounded"
+                >
+                  Close Camera
+                </button>
+              </>
+            )}
+          </div>
         </div>
 
         {/* Camera Preview */}
@@ -177,20 +175,6 @@ export default function CompanyForm() {
               autoPlay
               className="w-full border rounded"
             ></video>
-            <button
-              type="button"
-              onClick={capturePhoto}
-              className="mt-2 px-4 py-2 bg-green-500 text-white rounded"
-            >
-              Capture Photo
-            </button>
-            <button
-              type="button"
-              onClick={stopCamera}
-              className="mt-2 px-4 py-2 bg-red-500 text-white rounded"
-            >
-              Close Camera
-            </button>
           </div>
         )}
 
