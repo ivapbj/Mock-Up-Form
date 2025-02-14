@@ -7,7 +7,7 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-hook-form": "^7.54.2",
-    "react-scripts": "5.0.1"
+    "react-scripts": "^3.0.1"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -34,8 +34,10 @@
     ]
   },
   "devDependencies": {
+    "auto": "^11.3.0",
     "autoprefixer": "^10.4.20",
     "postcss": "^8.5.2",
+    "prefixer": "^0.0.3",
     "tailwindcss": "^4.0.6"
   }
 }
