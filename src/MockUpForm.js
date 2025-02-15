@@ -1,147 +1,169 @@
-import React, { useState, useRef } from "react";
-import { useForm } from "react-hook-form";
+import React, { useState } from "react";
 
-export default function CompanyForm() {
-  const { register, handleSubmit, setValue } = useForm();
-  const [imagePreview, setImagePreview] = useState(null);
-  const fileInputRef = useRef(null);
-  const [thankYouMessage, setThankYouMessage] = useState(null);
+const MockUpForm = () => {
+  const [companyName, setCompanyName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [message, setMessage] = useState("");
+  const [companyColors, setCompanyColors] = useState("#000000"); // Default color
+  const [file, setFile] = useState(null);
 
-  // Form submission
-  const onSubmit = async (data) => {
-    console.log("Form Data:", data);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-    // Prepare the form data
     const formData = new FormData();
-    formData.append("companyName", data.companyName);
-    formData.append("companyColors", data.companyColors);
-    formData.append("email", data.email);
-    formData.append("phone", data.phone);
-    formData.append("companyLogo", data.companyLogo[0]);
+    formData.append("companyName", companyName);
+    formData.append("email", email);
+    formData.append("phone", phone);
+    formData.append("message", message);
+    formData.append("companyColors", companyColors);
+    if (file) {
+      formData.append("file", file);
+    }
 
     try {
-      // POST request to your backend
-      const response = await fetch(
-        "https://theivanacollective.com/api/submit-form",
-        {
-          method: "POST",
-          body: formData,
-        }
-      );
+      const response = await fetch("http://localhost:5000/api/submit-form", {
+        method: "POST",
+        body: formData,
+      });
 
-      if (response.ok) {
-        // Show thank you message
-        setThankYouMessage(
-          "Thank you for contacting The Ivana Collective. Your results will be emailed within 48 hours."
-        );
-      } else {
-        // Handle error
-        alert("Something went wrong. Please try again later.");
-      }
+      const data = await response.json();
+      alert(
+        "Thank you for contacting The Ivana Collective, your results will be emailed within 48 hours."
+      );
     } catch (error) {
       console.error("Error submitting form:", error);
-      alert("Something went wrong. Please try again later.");
     }
   };
 
   return (
-    <div className="max-w-lg mx-auto p-6 border rounded-lg shadow-lg bg-white">
-      <h2 className="text-2xl font-bold text-black mb-4 text-center">
-        Company Information
-      </h2>
+    <form
+      onSubmit={handleSubmit}
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        maxWidth: "400px",
+        margin: "0 auto",
+        padding: "20px",
+        border: "1px solid #ddd",
+        borderRadius: "8px",
+        boxShadow: "2px 2px 10px rgba(0, 0, 0, 0.1)",
+        backgroundColor: "#fff",
+      }}
+    >
+      <label style={{ marginBottom: "10px" }}>
+        Company Name:
+        <input
+          type="text"
+          value={companyName}
+          onChange={(e) => setCompanyName(e.target.value)}
+          required
+          style={{
+            width: "100%",
+            padding: "8px",
+            marginTop: "5px",
+            borderRadius: "5px",
+            border: "1px solid #ccc",
+          }}
+        />
+      </label>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        {/* Company Name Field */}
-        <div>
-          <label className="block font-semibold text-black">Company Name</label>
-          <input
-            type="text"
-            {...register("companyName")}
-            className="w-full border-2 border-black p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-black transition text-black"
-            placeholder="Enter company name"
-            required
-          />
-        </div>
+      <label style={{ marginBottom: "10px" }}>
+        Email:
+        <input
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          style={{
+            width: "100%",
+            padding: "8px",
+            marginTop: "5px",
+            borderRadius: "5px",
+            border: "1px solid #ccc",
+          }}
+        />
+      </label>
 
-        {/* Company Colors */}
-        <div>
-          <label className="block font-semibold text-black">
-            Company Colors
-          </label>
-          <input
-            type="color"
-            {...register("companyColors")}
-            className="w-full border-2 border-black p-2 h-12 rounded-lg focus:outline-none focus:ring-2 focus:ring-black transition"
-          />
-        </div>
+      <label style={{ marginBottom: "10px" }}>
+        Phone:
+        <input
+          type="text"
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+          required
+          style={{
+            width: "100%",
+            padding: "8px",
+            marginTop: "5px",
+            borderRadius: "5px",
+            border: "1px solid #ccc",
+          }}
+        />
+      </label>
 
-        {/* Email Address */}
-        <div>
-          <label className="block font-semibold text-black">
-            Email Address
-          </label>
-          <input
-            type="email"
-            {...register("email")}
-            className="w-full border-2 border-black p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-black transition text-black"
-            required
-          />
-        </div>
+      <label style={{ marginBottom: "10px" }}>
+        Message:
+        <textarea
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+          rows="4"
+          style={{
+            width: "100%",
+            padding: "8px",
+            marginTop: "5px",
+            borderRadius: "5px",
+            border: "1px solid #ccc",
+            resize: "none",
+          }}
+        />
+      </label>
 
-        {/* Phone Number */}
-        <div>
-          <label className="block font-semibold text-black">Phone Number</label>
-          <input
-            type="tel"
-            {...register("phone")}
-            className="w-full border-2 border-black p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-black transition text-black"
-            required
-          />
-        </div>
+      <label style={{ marginBottom: "10px" }}>
+        Choose Company Colors:
+        <input
+          type="color"
+          value={companyColors}
+          onChange={(e) => setCompanyColors(e.target.value)}
+          style={{
+            width: "100%",
+            height: "40px",
+            border: "none",
+            cursor: "pointer",
+          }}
+        />
+      </label>
 
-        {/* Company Logo Upload */}
-        <div>
-          <label className="block font-semibold text-black">Company Logo</label>
+      <label style={{ marginBottom: "10px" }}>
+        Upload a File:
+        <input
+          type="file"
+          onChange={(e) => setFile(e.target.files[0])}
+          style={{
+            width: "100%",
+            padding: "5px",
+            marginTop: "5px",
+          }}
+        />
+      </label>
 
-          {imagePreview && (
-            <img
-              src={imagePreview}
-              alt="Preview"
-              className="w-32 h-32 object-cover rounded mt-2 border-2 border-black"
-            />
-          )}
-
-          <input
-            type="file"
-            accept="image/*"
-            {...register("companyLogo")}
-            className="w-full border-2 border-black p-2 rounded-lg mt-2 focus:outline-none focus:ring-2 focus:ring-black transition text-black"
-            ref={fileInputRef}
-            onChange={(e) => {
-              const file = e.target.files[0];
-              if (file) {
-                setImagePreview(URL.createObjectURL(file));
-                setValue("companyLogo", file);
-              }
-            }}
-          />
-        </div>
-
-        {/* Submit Button */}
-        <button
-          type="submit"
-          className="w-full bg-[#587B6A] text-black font-semibold p-3 rounded-lg hover:bg-[#486656] transition"
-        >
-          Submit
-        </button>
-      </form>
-
-      {/* Thank You Message */}
-      {thankYouMessage && (
-        <div className="mt-4 text-center text-black font-semibold">
-          {thankYouMessage}
-        </div>
-      )}
-    </div>
+      <button
+        type="submit"
+        style={{
+          width: "100%",
+          padding: "10px",
+          backgroundColor: "#007BFF",
+          color: "#fff",
+          border: "none",
+          borderRadius: "5px",
+          cursor: "pointer",
+          fontSize: "16px",
+        }}
+      >
+        Submit
+      </button>
+    </form>
   );
-}
+};
+
+export default MockUpForm;
