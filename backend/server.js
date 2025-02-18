@@ -2,10 +2,9 @@ const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const nodemailer = require("nodemailer");
-require("dotenv").config(); // If using environment variables
+require("dotenv").config(); // Load environment variables
 
 const app = express();
-const PORT = 5000;
 
 // Middleware
 app.use(cors());
@@ -15,8 +14,8 @@ app.use(bodyParser.json());
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
-    user: "theivanacollective@gmail.com", // Your email
-    pass: "hjan dcsm bkit jipt", // Replace with the generated App Password
+    user: process.env.EMAIL_USER, // Use environment variables
+    pass: process.env.EMAIL_PASS, // Never hardcode passwords!
   },
 });
 
@@ -25,8 +24,8 @@ app.post("/api/submit-form", async (req, res) => {
   const { companyName, email, phone, message } = req.body;
 
   const mailOptions = {
-    from: "theivanacollective@gmail.com",
-    to: "theivanacollective@gmail.com", // Where the form data should be sent
+    from: process.env.EMAIL_USER,
+    to: process.env.EMAIL_USER, // Send to the same email
     subject: "New Form Submission",
     html: `
       <h2>New Form Submission</h2>
@@ -49,7 +48,5 @@ app.post("/api/submit-form", async (req, res) => {
   }
 });
 
-// Start Server
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+// Export for Vercel (DO NOT USE `app.listen(PORT)`)
+module.exports = app;
