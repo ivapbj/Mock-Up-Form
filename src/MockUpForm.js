@@ -195,7 +195,7 @@ const MockUpForm = () => {
 
     try {
       // Make sure this URL points to your deployed backend
-      const response = await fetch("https://mock-up-form.vercel.app", {
+      const response = await fetch("/api/submit-form", {
         method: "POST",
         body: formData,
         // Don't set Content-Type header when sending FormData
