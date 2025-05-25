@@ -27,7 +27,7 @@ export default function ContactForm() {
       onSubmit={handleSubmit}
       className="flex flex-col max-w-md mx-auto p-6 bg-white rounded-lg shadow-md border border-gray-200"
     >
-      <h2 className="text-xl font-semibold text-center mb-6">Contact Us</h2>
+      <h2 className="text-xl font-semibold text-center mb-6">Free Mock-Ups</h2>
 
       {submitMessage && (
         <div className="p-3 mb-4 bg-green-100 text-green-800 rounded-md">

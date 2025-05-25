@@ -1,5 +1,5 @@
 import React from "react";
-import MockUpForm from "./MockUpFormForm";
+import MockUpForm from "./MockUpForm";
 
 function App() {
   return (
