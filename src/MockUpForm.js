@@ -18,7 +18,7 @@ export default function ContactForm() {
     // Do your form submission logic here...
 
     try {
-      const res = await fetch("/api/submit-form", {
+      const res = await fetch("/api/send", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
