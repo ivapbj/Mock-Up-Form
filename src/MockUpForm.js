@@ -10,16 +10,41 @@ export default function ContactForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitMessage, setSubmitMessage] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setSubmitMessage("");
 
     // Do your form submission logic here...
 
-    setTimeout(() => {
+    try {
+      const res = await fetch("/api/submit-form", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: companyName,
+          email,
+          phone,
+          message,
+          brandColors: companyColors,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        setSubmitMessage("Form submitted successfully!");
+      } else {
+        setSubmitMessage(`Error: ${data.message}`);
+      }
+    } catch (error) {
+      console.error("Submission error:", error);
+      setSubmitMessage("Something went wrong. Please try again later.");
+    } finally {
       setIsSubmitting(false);
-      setSubmitMessage("Form submitted successfully!");
-    }, 2000);
+    }
   };
 
   return (
