@@ -1,5 +1,5 @@
 // api/submit-form.js
-// api/send.js
+
 const nodemailer = require("nodemailer");
 
 module.exports = async (req, res) => {
