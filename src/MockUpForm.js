@@ -44,21 +44,21 @@ export default function ContactForm() {
     setSubmitStatus("");
 
     try {
-      // Create FormData for file upload
-      const formData = new FormData();
-      formData.append("companyName", companyName);
-      formData.append("email", email);
-      formData.append("phone", phone);
-      formData.append("message", message);
-      formData.append("companyColors", companyColors);
-
-      if (file) {
-        formData.append("file", file);
-      }
+      // Send JSON data (we'll add file upload back later)
+      const formData = {
+        companyName,
+        email,
+        phone,
+        message,
+        companyColors,
+      };
 
       const res = await fetch("/api/submit-form", {
         method: "POST",
-        body: formData, // Don't set Content-Type header when using FormData
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
       });
 
       const data = await res.json();
